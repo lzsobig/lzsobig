@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI 观察 · 探索智能与创造的边界</title>
+  <meta name="description" content="资深前端开发者的个人博客，分享 AI 技术探索、Web 开发实战技巧及深度生活思考。">
+  
+  <!-- SEO & Open Graph -->
+  <meta property="og:title" content="AI 观察 · 探索智能与创造的边界">
+  <meta property="og:description" content="记录 AI、Web 开发与生活思考。用文字沉淀每一次探索。">
+  <meta property="og:type" content="website">
+  
+  <!-- Google Fonts: Inter & Noto Sans SC (Kimi 风格搭配) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            surface: {
+              DEFAULT: '#000000',
+              raised: '#0a0a0a',
+              overlay: '#141414',
+              hover: '#1a1a1a',
+            },
+            accent: {
+              DEFAULT: '#a3e635', // Kimi 风格荧光绿
+              muted: 'rgba(163, 230, 53, 0.1)',
+              hover: '#bef264',
+            },
+            text: {
+              primary: '#f5f5f5',
+              secondary: '#a1a1aa',
+              muted: '#52525b',
+            },
+          },
+          fontFamily: {
+            sans: ['Inter', 'Noto Sans SC', 'system-ui', 'sans-serif'],
+          },
+          animation: {
+            'float': 'float 6s ease-in-out infinite',
+            'glow': 'glow 4s ease-in-out infinite',
+          },
+          keyframes: {
+            float: {
+              '0%, 100%': { transform: 'translateY(0)' },
+              '50%': { transform: 'translateY(-10px)' },
+            },
+            glow: {
+              '0%, 100%': { opacity: '0.05' },
+              '50%': { opacity: '0.12' },
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Opt: 全局样式与变量定义 */
+    :root {
+      --color-surface: #ffffff;
+      --color-surface-raised: #fafafa;
+      --color-text-primary: #18181b;
+      --color-text-secondary: #52525b;
+    }
+    
+    .dark {
+      --color-surface: #000000;
+      --color-surface-raised: #0a0a0a;
+      --color-text-primary: #f5f5f5;
+      --color-text-secondary: #a1a1aa;
+      --nav-bg: rgba(0, 0, 0, 0.4);
+    }
+    
+    :root:not(.dark) {
+      --color-surface: #ffffff;
+      --color-surface-raised: #f8f9fa;
+      --color-text-primary: #1a1a1b;
+      --color-text-secondary: #4a4a4a;
+      --nav-bg: rgba(255, 255, 255, 0.7);
+    }
+
+    body {
+      background-color: var(--color-surface);
+      color: var(--color-text-primary);
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    /* Opt: Kimi 风格背景辉光 */
+    .bg-glow {
+      position: fixed;
+      top: -10%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 120vw;
+      height: 70vh;
+      background: radial-gradient(ellipse at center, rgba(163, 230, 53, 0.08) 0%, transparent 75%);
+      pointer-events: none;
+      z-index: 0;
+      filter: blur(40px);
+    }
+    :root:not(.dark) .bg-glow {
+      background: radial-gradient(ellipse at center, rgba(163, 230, 53, 0.15) 0%, transparent 75%);
+    }
+
+    /* Opt: 导航栏背景适配 */
+    #navbar {
+      background: var(--nav-bg);
+    }
+    .nav-link {
+      position: relative;
+      transition: color 0.3s ease;
+    }
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      left: 0;
+      width: 0;
+      height: 1.5px;
+      background: #a3e635;
+      transition: width 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+    }
+    .nav-link:hover::after { width: 100%; }
+
+    /* Opt: 胶囊按钮优化 */
+    .pill-btn {
+      padding: 8px 24px;
+      border-radius: 9999px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      background: rgba(255, 255, 255, 0.02);
+      color: var(--color-text-secondary);
+    }
+    .pill-btn:hover {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--color-text-primary);
+    }
+    .pill-btn.active {
+      background: #a3e635;
+      color: #000;
+      font-weight: 600;
+      border-color: #a3e635;
+      box-shadow: 0 10px 20px -5px rgba(163, 230, 53, 0.3);
+    }
+
+    /* Opt: 文章卡片悬浮感重构 */
+    .article-card {
+      background: var(--color-surface-raised);
+      border-radius: 28px;
+      border: 1px solid rgba(255, 255, 255, 0.03);
+      transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+    }
+    .article-card:hover {
+      transform: translateY(-8px) scale(1.01);
+      border-color: rgba(163, 230, 53, 0.2);
+      box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.6), 0 0 20px -5px rgba(163, 230, 53, 0.1);
+    }
+
+    /* Opt: 滚动进度条 */
+    #scrollProgress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 0%;
+      height: 2px;
+      background: linear-gradient(90deg, #a3e635, #bef264);
+      z-index: 100;
+      transition: width 0.1s linear;
+    }
+
+    /* Opt: 柔和进入动画 */
+    .reveal {
+      opacity: 0;
+      transform: translateY(40px);
+      transition: opacity 1s cubic-bezier(0.23, 1, 0.32, 1), transform 1s cubic-bezier(0.23, 1, 0.32, 1);
+    }
+    .reveal.active {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Opt: A11y 焦点环 */
+    *:focus-visible {
+      outline: 2px solid #a3e635;
+      outline-offset: 4px;
+    }
+
+    /* Opt: 移动端菜单 */
+    #mobileMenu {
+      transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+      transform: translateY(-20px) scale(0.95);
+      opacity: 0;
+      pointer-events: none;
+    }
+    #mobileMenu.show {
+      transform: translateY(0) scale(1);
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    /* Opt: Toast 动画 */
+    .toast-item {
+      padding: 14px 28px;
+      border-radius: 9999px;
+      background: #1a1a1a;
+      color: #f5f5f5;
+      border: 1px solid rgba(255,255,255,0.1);
+      font-weight: 500;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+      animation: toastIn 0.5s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+    }
+    @keyframes toastIn {
+      from { opacity: 0; transform: translateY(20px) scale(0.9); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .editing-ring { outline: 2px dashed rgba(163, 230, 53, 0.4); outline-offset: 8px; }
+
+    /* Opt: 文章详情页样式 */
+    #articleDetail {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      background: var(--color-surface);
+      overflow-y: auto;
+      display: none;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+    }
+    #articleDetail.show {
+      display: block;
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .prose blockquote {
+      border-left: 4px solid #a3e635;
+      padding-left: 1.5rem;
+      font-style: italic;
+      color: var(--color-text-secondary);
+      margin: 2rem 0;
+    }
+    .prose h3 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      margin-top: 2.5rem;
+      margin-bottom: 1.25rem;
+      color: var(--color-text-primary);
+    }
+    .prose p {
+      margin-bottom: 1.5rem;
+      font-size: 1.125rem;
+    }
+    .prose code {
+      background: rgba(163, 230, 53, 0.1);
+      color: #a3e635;
+      padding: 0.2em 0.4em;
+      border-radius: 4px;
+      font-size: 0.9em;
+    }
+
+    /* Opt: 编辑器容器样式 */
+    #editorView {
+      position: fixed;
+      inset: 0;
+      z-index: 150;
+      background: var(--color-surface);
+      display: none;
+      flex-direction: column;
+    }
+    #editorView.show { display: flex; }
+    .editor-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2px;
+      flex: 1;
+      background: rgba(255,255,255,0.05);
+      overflow: hidden;
+    }
+    .editor-textarea {
+      background: var(--color-surface);
+      color: var(--color-text-primary);
+      padding: 2rem;
+      resize: none;
+      outline: none;
+      font-family: 'Fira Code', monospace;
+      font-size: 1rem;
+      line-height: 1.6;
+    }
+    .preview-pane {
+      background: var(--color-surface-raised);
+      padding: 2rem;
+      overflow-y: auto;
+    }
+
+    /* Opt: 文字排版微调 */
+    .hero-title { letter-spacing: -0.04em; }
+    .reading-content { line-height: 1.8; letter-spacing: 0.01em; }
+  </style>
+</head>
+<body class="bg-surface text-text-primary font-sans min-h-screen relative selection:bg-accent/30 selection:text-accent">
+
+  <!-- 背景辉光 -->
+  <div class="bg-glow"></div>
+  <div id="scrollProgress"></div>
+
+  <!-- 导航栏 -->
+  <nav id="navbar" class="fixed top-0 w-full z-50 transition-all duration-500 border-b border-white/[0.04] backdrop-blur-2xl" role="navigation">
+    <div class="max-w-6xl mx-auto px-6 h-20 flex justify-between items-center">
+      <a href="#" class="flex items-center gap-3 group" aria-label="首页">
+        <div class="w-9 h-9 rounded-xl bg-accent flex items-center justify-center transform group-hover:rotate-6 transition-transform shadow-lg shadow-accent/20">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#000" class="w-5 h-5">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+          </svg>
+        </div>
+        <span class="font-bold text-xl tracking-tight text-text-primary">AI 观察</span>
+      </a>
+
+      <div class="flex items-center gap-4">
+        <div class="hidden md:flex items-center gap-10 mr-8 text-sm font-medium">
+          <a href="#" class="nav-link text-text-secondary hover:text-text-primary">首页</a>
+          <a href="#" class="nav-link text-text-secondary hover:text-text-primary">归档</a>
+          <a href="#" class="nav-link text-text-secondary hover:text-text-primary">关于</a>
+        </div>
+
+        <button onclick="toggleDark()" class="w-10 h-10 rounded-full flex items-center justify-center hover:bg-black/5 dark:hover:bg-white/5 transition-colors" aria-label="切换主题">
+          <svg id="themeIcon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-text-secondary transition-all duration-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"></svg>
+        </button>
+
+        <button onclick="toggleEdit()" id="editLabel" class="hidden sm:inline-flex items-center gap-2 px-5 py-2 rounded-full text-sm font-semibold bg-black/[0.04] dark:bg-white/[0.04] hover:bg-black/[0.08] dark:hover:bg-white/[0.08] border border-black/[0.08] dark:border-white/[0.08] transition-all active:scale-95 text-text-primary">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
+          </svg>
+          编辑
+        </button>
+
+        <button onclick="toggleMobile()" class="md:hidden w-10 h-10 rounded-full flex items-center justify-center hover:bg-black/5 dark:hover:bg-white/5" aria-label="打开菜单">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- 移动端菜单 -->
+  <div id="mobileMenu" class="fixed top-24 inset-x-6 z-40 md:hidden">
+    <div class="bg-surface-raised/90 backdrop-blur-3xl rounded-3xl border border-black/[0.06] dark:border-white/[0.06] p-3 space-y-1 shadow-2xl">
+      <a href="#" class="block px-6 py-4 rounded-2xl hover:bg-black/5 dark:hover:bg-white/5 text-text-secondary hover:text-text-primary transition-colors">首页</a>
+      <a href="#" class="block px-6 py-4 rounded-2xl hover:bg-black/5 dark:hover:bg-white/5 text-text-secondary hover:text-text-primary transition-colors">归档</a>
+      <a href="#" class="block px-6 py-4 rounded-2xl hover:bg-black/5 dark:hover:bg-white/5 text-text-secondary hover:text-text-primary transition-colors">关于</a>
+    </div>
+  </div>
+
+  <!-- 主内容 -->
+  <main class="max-w-6xl mx-auto pt-40 md:pt-56 px-6 pb-40 relative z-10">
+    <!-- Hero Section -->
+    <header class="mb-32 md:mb-48 reveal">
+      <h1 class="hero-title text-6xl sm:text-7xl md:text-8xl lg:text-[10rem] font-bold tracking-tighter leading-[0.9] mb-12">
+        <span class="block text-transparent bg-clip-text bg-gradient-to-br from-text-primary via-text-primary to-text-primary/40">探索智能</span>
+        <span class="block text-transparent bg-clip-text bg-gradient-to-br from-accent to-accent/50 mt-4">与创造</span>
+      </h1>
+      <p class="text-xl md:text-2xl text-text-secondary max-w-2xl leading-relaxed font-light reading-content">
+        记录 AI、Web 开发与生活思考。<br class="hidden md:block">
+        用文字沉淀每一次探索，让想法生根发芽。
+      </p>
+    </header>
+
+    <!-- 分类筛选 -->
+    <section class="flex gap-3 mb-16 overflow-x-auto no-scrollbar pb-4 reveal" aria-label="文章分类">
+      <button class="pill-btn active" data-f="all" onclick="filterPosts('all')">全部</button>
+      <button class="pill-btn" data-f="ai" onclick="filterPosts('ai')">人工智能</button>
+      <button class="pill-btn" data-f="web" onclick="filterPosts('web')">Web 开发</button>
+      <button class="pill-btn" data-f="life" onclick="filterPosts('life')">生活随笔</button>
+    </section>
+
+    <!-- 文章网格 -->
+    <div id="postsGrid" class="grid gap-10 sm:grid-cols-2 lg:grid-cols-3">
+      <!-- Opt: 添加 cursor-pointer 和 onclick 事件 -->
+      <article data-cat="ai" class="article-card group reveal cursor-pointer" onclick="openArticle('ai-prompt')">
+        <div class="aspect-[16/10] overflow-hidden rounded-t-[28px] bg-surface-overlay">
+          <img src="https://picsum.photos/seed/ai1/800/500" alt="ChatGPT 提示词工程" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000 ease-out">
+        </div>
+        <div class="p-8">
+          <div class="mb-5">
+            <span class="inline-flex items-center px-3 py-1 rounded-md bg-accent/10 text-accent text-[10px] font-bold uppercase tracking-widest">AI Engineering</span>
+          </div>
+          <h2 class="text-2xl font-bold mb-4 text-text-primary group-hover:text-accent transition-colors duration-300 leading-tight">ChatGPT 提示词工程进阶</h2>
+          <p class="text-text-secondary text-sm leading-relaxed mb-8 line-clamp-2 font-light">通过结构化思维链提升大模型输出质量，掌握面向未来的沟通语言。</p>
+          <div class="flex justify-between items-center pt-6 border-t border-black/[0.04] dark:border-white/[0.04]">
+            <time class="text-xs text-text-muted font-medium">2026-04-20</time>
+            <span class="text-xs text-text-muted font-medium">8 Min Read</span>
+          </div>
+        </div>
+      </article>
+
+      <article data-cat="ai" class="article-card group reveal cursor-pointer" onclick="openArticle('ai-sd')">
+        <div class="aspect-[16/10] overflow-hidden rounded-t-[28px] bg-surface-overlay">
+          <img src="https://picsum.photos/seed/ai2/800/500" alt="Stable Diffusion" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000 ease-out">
+        </div>
+        <div class="p-8">
+          <div class="mb-5">
+            <span class="inline-flex items-center px-3 py-1 rounded-md bg-accent/10 text-accent text-[10px] font-bold uppercase tracking-widest">Generative AI</span>
+          </div>
+          <h2 class="text-2xl font-bold mb-4 text-text-primary group-hover:text-accent transition-colors duration-300 leading-tight">Stable Diffusion 本地部署指北</h2>
+          <p class="text-text-secondary text-sm leading-relaxed mb-8 line-clamp-2 font-light">从零搭建 Automatic1111 环境，解锁本地化图像生成的无限可能。</p>
+          <div class="flex justify-between items-center pt-6 border-t border-black/[0.04] dark:border-white/[0.04]">
+            <time class="text-xs text-text-muted font-medium">2026-04-18</time>
+            <span class="text-xs text-text-muted font-medium">12 Min Read</span>
+          </div>
+        </div>
+      </article>
+
+      <article data-cat="web" class="article-card group reveal cursor-pointer" onclick="openArticle('web-tailwind')">
+        <div class="aspect-[16/10] overflow-hidden rounded-t-[28px] bg-surface-overlay">
+          <img src="https://picsum.photos/seed/web1/800/500" alt="Tailwind" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000 ease-out">
+        </div>
+        <div class="p-8">
+          <div class="mb-5">
+            <span class="inline-flex items-center px-3 py-1 rounded-md bg-blue-500/10 text-blue-400 text-[10px] font-bold uppercase tracking-widest">Web Development</span>
+          </div>
+          <h2 class="text-2xl font-bold mb-4 text-text-primary group-hover:text-blue-400 transition-colors duration-300 leading-tight">Tailwind CSS 实战技巧</h2>
+          <p class="text-text-secondary text-sm leading-relaxed mb-8 line-clamp-2 font-light">超越基础：深入理解 JIT 引擎、自定义主题与高性能插件开发工作流。</p>
+          <div class="flex justify-between items-center pt-6 border-t border-black/[0.04] dark:border-white/[0.04]">
+            <time class="text-xs text-text-muted font-medium">2026-04-15</time>
+            <span class="text-xs text-text-muted font-medium">6 Min Read</span>
+          </div>
+        </div>
+      </article>
+    </div>
+  </main>
+
+  <footer class="relative z-10 border-t border-black/[0.04] dark:border-white/[0.04] bg-white/40 dark:bg-black/40 backdrop-blur-3xl">
+    <div class="max-w-6xl mx-auto px-6 py-16 flex flex-col md:flex-row justify-between items-center gap-6 text-sm text-text-muted">
+      <div class="flex items-center gap-3">
+        <span class="font-bold text-text-primary">AI Insight</span>
+        <span class="text-black/20 dark:text-white/20">|</span>
+        <span>© 2026 Personal Blog.</span>
+      </div>
+      <div class="flex gap-8">
+        <a href="#" class="hover:text-accent transition-colors">Privacy</a>
+        <a href="#" class="hover:text-accent transition-colors">RSS Feed</a>
+        <a href="#" class="hover:text-accent transition-colors">Twitter</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Toast 容器 -->
+  <div id="toastBox" class="fixed bottom-12 left-1/2 -translate-x-1/2 z-[9999] flex flex-col gap-4 pointer-events-none"></div>
+
+  <!-- Opt: 文章详情视图 -->
+  <div id="articleDetail" class="no-scrollbar">
+    <div class="max-w-3xl mx-auto px-6 py-24">
+      <button onclick="closeArticle()" class="mb-12 group flex items-center gap-2 text-text-secondary hover:text-accent transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 transform group-hover:-translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+        </svg>
+        <span>返回首页</span>
+      </button>
+      
+      <div id="detailContent" class="prose prose-invert max-w-none">
+        <!-- 内容由 JS 动态注入 -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Opt: 可视化编辑器视图 -->
+  <div id="editorView" class="no-scrollbar">
+    <header class="h-16 border-b border-white/[0.04] px-6 flex justify-between items-center bg-black/40 backdrop-blur-xl">
+      <div class="flex items-center gap-4">
+        <span class="font-bold text-accent">Markdown 编辑器</span>
+        <span id="saveStatus" class="text-xs text-text-muted">已自动保存</span>
+      </div>
+      <div class="flex items-center gap-3">
+        <button onclick="closeEditor()" class="px-4 py-1.5 rounded-full text-sm bg-white/5 hover:bg-white/10 transition-all">取消</button>
+        <button onclick="publishArticle()" class="px-6 py-1.5 rounded-full text-sm bg-accent text-black font-bold hover:bg-accent-hover transition-all shadow-lg shadow-accent/20">发布文章</button>
+      </div>
+    </header>
+    <div class="editor-container">
+      <textarea id="markdownInput" class="editor-textarea no-scrollbar" placeholder="在此输入 Markdown 内容..." oninput="updatePreview()"></textarea>
+      <div id="markdownPreview" class="preview-pane prose prose-invert max-w-none no-scrollbar"></div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script>
+    // Opt: 增加编辑器逻辑
+    function toggleEdit() {
+      const editor = document.getElementById('editorView');
+      editor.style.display = 'flex';
+      setTimeout(() => editor.classList.add('show'), 10);
+      
+      // 加载草稿
+      const draft = localStorage.getItem('blog_draft') || '';
+      document.getElementById('markdownInput').value = draft;
+      updatePreview();
+    }
+
+    function closeEditor() {
+      const editor = document.getElementById('editorView');
+      editor.classList.remove('show');
+      setTimeout(() => editor.style.display = 'none', 500);
+    }
+
+    function updatePreview() {
+      const input = document.getElementById('markdownInput').value;
+      const preview = document.getElementById('markdownPreview');
+      preview.innerHTML = marked.parse(input);
+      
+      // 自动保存
+      localStorage.setItem('blog_draft', input);
+      const status = document.getElementById('saveStatus');
+      status.innerText = '正在保存...';
+      setTimeout(() => status.innerText = '已自动保存', 800);
+    }
+
+    function publishArticle() {
+      toast('文章已模拟发布成功！内容已同步至草稿箱');
+      closeEditor();
+    }
+
+    // Opt: 博客内容数据
+    const ARTICLES_DATA = {
+      'ai-prompt': {
+        category: 'AI Engineering',
+        title: 'ChatGPT 提示词工程进阶',
+        date: '2026-04-20',
+        readTime: '8 Min Read',
+        content: `
+          <h1 class="text-4xl md:text-6xl font-bold mb-8 leading-tight text-text-primary hero-title">ChatGPT 提示词工程进阶</h1>
+          <div class="flex items-center gap-4 mb-12 text-text-muted">
+            <span class="px-3 py-1 rounded-md bg-accent/10 text-accent text-xs font-bold uppercase tracking-widest">AI Engineering</span>
+            <span>2026-04-20</span>
+            <span>8 Min Read</span>
+          </div>
+          <p class="text-xl md:text-2xl text-text-secondary mb-16 font-light reading-content">通过结构化思维链提升大模型输出质量，掌握面向未来的沟通语言。</p>
+          <img src="https://picsum.photos/seed/ai1/1200/600" class="w-full rounded-[40px] mb-20 shadow-2xl" alt="Prompt Engineering">
+          
+          <div class="prose prose-lg dark:prose-invert max-w-none">
+            <h3>1. 什么是结构化提示词？</h3>
+            <p>结构化提示词（Structured Prompting）是一种将任务分解为角色、背景、目标、限制和示例的系统化方法。它能显著降低模型产生幻觉的概率，使输出更加稳定和专业。</p>
+            <blockquote>
+              “好的提示词不是在命令模型，而是在为模型构建一个完整的认知上下文。”
+            </blockquote>
+
+            <h3>2. 思维链 (Chain of Thought)</h3>
+            <p>通过引导模型展示其推理过程，我们可以获得更具逻辑性的答案。例如，在提示词中加入 <code>Let's think step by step</code>，能有效解决复杂的逻辑推导问题。</p>
+            
+            <h3>3. 智能建造中的应用</h3>
+            <p>在智能建造领域，AI 可以辅助生成施工方案、进行结构优化设计。通过精准的提示词，工程师可以快速从海量规范中提取核心指标，实现设计效率的指数级提升。</p>
+          </div>
+        `
+      },
+      'ai-sd': {
+        category: 'Generative AI',
+        title: 'Stable Diffusion 本地部署指北',
+        date: '2026-04-18',
+        readTime: '12 Min Read',
+        content: `
+          <h1 class="text-4xl md:text-6xl font-bold mb-8 leading-tight text-text-primary hero-title">Stable Diffusion 本地部署指北</h1>
+          <div class="flex items-center gap-4 mb-12 text-text-muted">
+            <span class="px-3 py-1 rounded-md bg-accent/10 text-accent text-xs font-bold uppercase tracking-widest">Generative AI</span>
+            <span>2026-04-18</span>
+            <span>12 Min Read</span>
+          </div>
+          <p class="text-xl md:text-2xl text-text-secondary mb-16 font-light reading-content">从零搭建 Automatic1111 环境，解锁本地化图像生成的无限可能。</p>
+          <img src="https://picsum.photos/seed/ai2/1200/600" class="w-full rounded-[40px] mb-20 shadow-2xl" alt="Stable Diffusion">
+          
+          <div class="prose prose-lg dark:prose-invert max-w-none">
+            <h3>硬件与环境准备</h3>
+            <p>本地运行 Stable Diffusion 建议使用显存 8GB 以上的 NVIDIA 显卡。安装过程涉及 Python、Git 以及 CUDA 环境的配置。</p>
+
+            <h3>核心步骤剖析</h3>
+            <p>1. 环境隔离：使用 venv 或 Conda 创建独立的 Python 环境。<br>2. 依赖安装：运行 <code>webui-user.bat</code> 自动下载模型与 Web 界面。<br>3. 模型选择：根据需求下载 <code>v1.5</code>, <code>v2.1</code> 或 <code>SDXL</code> 权重文件。</p>
+
+            <h3>行业影响</h3>
+            <p>生成式 AI 正在重塑建筑可视化行业。以往需要数天渲染的效果图，现在可以通过 SD 在数分钟内生成数十个方案原型。</p>
+          </div>
+        `
+      },
+      'web-tailwind': {
+        category: 'Web Development',
+        title: 'Tailwind CSS 实战技巧',
+        date: '2026-04-15',
+        readTime: '6 Min Read',
+        content: `
+          <h1 class="text-4xl md:text-6xl font-bold mb-8 leading-tight text-text-primary hero-title">Tailwind CSS 实战技巧</h1>
+          <div class="flex items-center gap-4 mb-12 text-text-muted">
+            <span class="px-3 py-1 rounded-md bg-blue-500/10 text-blue-400 text-xs font-bold uppercase tracking-widest">Web Development</span>
+            <span>2026-04-15</span>
+            <span>6 Min Read</span>
+          </div>
+          <p class="text-xl md:text-2xl text-text-secondary mb-16 font-light reading-content">超越基础：深入理解 JIT 引擎、自定义主题与高性能插件开发工作流。</p>
+          <img src="https://picsum.photos/seed/web1/1200/600" class="w-full rounded-[40px] mb-20 shadow-2xl" alt="Tailwind CSS">
+          
+          <div class="prose prose-lg dark:prose-invert max-w-none">
+            <h3>为什么是 Utility-First？</h3>
+            <p>Tailwind 彻底改变了前端开发的逻辑。它不仅提升了开发速度，更重要的是通过约束间距、颜色等指标，确保了 UI 的高度一致性。</p>
+
+            <h3>进阶配置：Theme & Plugins</h3>
+            <p>通过 <code>tailwind.config.js</code>，我们可以轻松实现如本项目中的 Kimi 风格暗黑模式适配。JIT (Just-In-Time) 引擎则确保了最终生成的 CSS 极度精简。</p>
+          </div>
+        `
+      }
+    };
+
+    // Opt: 核心交互逻辑
+    function openArticle(id) {
+      const data = ARTICLES_DATA[id];
+      if (!data) return;
+      
+      const detail = document.getElementById('articleDetail');
+      const content = document.getElementById('detailContent');
+      
+      content.innerHTML = data.content;
+      detail.style.display = 'block';
+      document.body.style.overflow = 'hidden'; // 禁止背景滚动
+      
+      setTimeout(() => {
+        detail.classList.add('show');
+      }, 10);
+      
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function closeArticle() {
+      const detail = document.getElementById('articleDetail');
+      detail.classList.remove('show');
+      document.body.style.overflow = ''; // 恢复背景滚动
+      
+      setTimeout(() => {
+        detail.style.display = 'none';
+      }, 500);
+    }
+
+    window.addEventListener('scroll', () => {
+      const scrollTotal = document.documentElement.scrollHeight - window.innerHeight;
+      const scrolled = (window.scrollY / scrollTotal) * 100;
+      document.getElementById("scrollProgress").style.width = scrolled + "%";
+      
+      const nav = document.getElementById('navbar');
+      if (window.scrollY > 50) {
+        nav.classList.add('h-16', 'bg-black/80');
+        nav.classList.remove('h-20', 'bg-black/40');
+      } else {
+        nav.classList.add('h-20', 'bg-black/40');
+        nav.classList.remove('h-16', 'bg-black/80');
+      }
+    });
+
+    function toggleDark() {
+      const isDark = document.documentElement.classList.toggle('dark');
+      localStorage.setItem('blog_dark', isDark ? '1' : '0');
+      updateThemeIcon(isDark);
+      toast(isDark ? '已切换至深色模式' : '已切换至浅色模式');
+    }
+
+    function updateThemeIcon(isDark) {
+      const icon = document.getElementById('themeIcon');
+      if (!icon) return;
+      icon.style.transform = 'rotate(360deg)';
+      setTimeout(() => icon.style.transform = '', 500);
+      icon.innerHTML = isDark ? 
+        '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>' :
+        '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 9H3m3.343-5.657l.707.707m12.728 12.728l.707.707M6.343 17.657l-.707.707M17.657 6.343l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>';
+    }
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('active'); });
+    }, { threshold: 0.1 });
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+    let isEditing = false;
+    function toggleEdit() {
+      isEditing = !isEditing;
+      document.querySelectorAll('#postsGrid article').forEach(a => {
+        a.contentEditable = isEditing;
+        if (isEditing) a.classList.add('editing-ring');
+        else a.classList.remove('editing-ring');
+      });
+      const btn = document.getElementById('editLabel');
+      btn.innerHTML = isEditing ? '完成' : '编辑';
+      toast(isEditing ? '实时编辑模式已开启' : '更改已保存');
+    }
+
+    function filterPosts(cat) {
+      const cards = document.querySelectorAll('#postsGrid article');
+      cards.forEach(card => {
+        if (cat === 'all' || card.dataset.cat === cat) {
+          card.style.display = 'block';
+          setTimeout(() => card.classList.add('active'), 50);
+        } else {
+          card.classList.remove('active');
+          card.style.display = 'none';
+        }
+      });
+      document.querySelectorAll('.pill-btn').forEach(btn => {
+        const btnCat = btn.getAttribute('data-f');
+        if (btnCat === cat) btn.classList.add('active');
+        else btn.classList.remove('active');
+      });
+    }
+
+    function toggleMobile() { document.getElementById('mobileMenu').classList.toggle('show'); }
+
+    // Opt: SEO 与无障碍增强
+    function injectStructuredData() {
+      const script = document.createElement('script');
+      script.type = 'application/ld+json';
+      const data = {
+        "@context": "https://schema.org",
+        "@type": "BlogPosting",
+        "headline": "AI 观察 · 探索智能与创造的边界",
+        "description": "分享 AI 技术、Web 开发与智能建造的深度思考。",
+        "author": { "@type": "Person", "name": "李振" }
+      };
+      script.text = JSON.stringify(data);
+      document.head.appendChild(script);
+    }
+
+    function toast(msg) {
+      const box = document.getElementById('toastBox');
+      const el = document.createElement('div');
+      el.className = 'toast-item';
+      el.textContent = msg;
+      box.appendChild(el);
+      setTimeout(() => { el.style.opacity = '0'; setTimeout(() => el.remove(), 500); }, 2500);
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      const isDark = document.documentElement.classList.contains('dark');
+      updateThemeIcon(isDark);
+      injectStructuredData(); // 注入 JSON-LD
+      
+      setTimeout(() => {
+        document.querySelectorAll('.reveal').forEach(el => {
+          const rect = el.getBoundingClientRect();
+          if (rect.top < window.innerHeight * 0.95) el.classList.add('active');
+        });
+      }, 200);
+    });
+  </script>
+</body>
+</html>
