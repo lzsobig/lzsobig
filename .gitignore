@@ -1,0 +1,18 @@
+# 忽略安装包
+Claudia_Setup.exe
+
+# 忽略 Node.js 依赖
+node_modules/
+dist/
+build/
+
+# 忽略 OS 生成的文件
+.DS_Store
+Thumbs.db
+
+# 忽略日志文件
+*.log
+
+# 忽略本地环境变量
+.env
+.env.local
