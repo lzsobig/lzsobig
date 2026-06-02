@@ -9,7 +9,6 @@
 ## 🐱 BuddyDesk — Windows 桌面 AI 伴侣
 
 <p align="center">
-  <img src="assets/cat_frames_v2/preview_idle.png" width="60" alt="BuddyDesk">
 </p>
 
 <p align="center">
